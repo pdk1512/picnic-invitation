@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hành Trình Cảm Xúc</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #000;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .slideshow-container {
+      position: relative;
+      width: 90%;
+      max-width: 800px;
+    }
+    .mySlides {
+      display: none;
+      position: relative;
+      text-align: center;
+    }
+    .mySlides img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .caption {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 1.4em;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      border-radius: 0 0 10px 10px;
+      min-height: 60px;
+    }
+    .typing {
+      border-right: .15em solid #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+      animation: typing 3s steps(40, end) forwards, blink .75s step-end infinite;
+    }
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+    .question {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      margin-top: 30px;
+      font-size: 1.5em;
+      text-align: center;
+    }
+    .question-text {
+      min-height: 40px;
+    }
+    .question-buttons {
+      display: none;
+      gap: 20px;
+    }
+    .question button {
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #ff69b4;
+      color: white;
+      transition: 0.3s;
+    }
+    .question button:hover {
+      opacity: 0.9;
+    }
+    .selection-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #a64bf4, #e2b0ff);
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      color: white;
+      text-align: center;
+      padding: 40px;
+      gap: 20px;
+    }
+    .selection-screen h2 {
+      font-size: 2em;
+    }
+    .selection-buttons {
+      display: flex;
+      gap: 20px;
+    }
+    .selection-buttons button {
+      padding: 12px 24px;
+      font-size: 1em;
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      position: relative; /* Keep this for food tooltips */
+    }
+    .selection-buttons button img {
+      cursor: pointer;
+    }
+    .selection-buttons button:hover::after {
+      content: none; /* Disable tooltip for day and time buttons */
+    }
+    .question button:hover, .selection-buttons button:hover {
+      background-color: #ff1493; /* Darker pink */
+      box-shadow: 0 4px 8px rgba(255, 20, 147, 0.5);
+    }
+
+    .question button:active, .selection-buttons button:active {
+      background-color: #c71585; /* Even darker pink */
+      box-shadow: 0 2px 4px rgba(199, 21, 133, 0.3);
+    }
+
+    .question button, .selection-buttons button {
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Disable tooltip for day and time selection buttons */
+    #selectDay .selection-buttons button:hover::after,
+    #selectTime .selection-buttons button:hover::after {
+      content: none;
+    }
+
+    /* Enable tooltip for food selection buttons */
+    #selectFood .selection-buttons button:hover::after {
+      content: attr(data-tooltip); /* Display the tooltip text */
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.9em;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    .selection-buttons label {
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: background-color 0.3s ease;
+    }
+
+    .selection-buttons label img {
+      display: block;
+      width: 100px;
+      height: 100px;
+      border-radius: 10px;
+      pointer-events: none; /* Prevent direct interaction with the image */
+    }
+
+    .selection-buttons input[type="checkbox"] {
+      display: none; /* Hide the checkbox */
+    }
+
+    .selection-buttons input[type="checkbox"]:checked + img {
+      background-color: rgba(255, 20, 147, 0.5); /* Bolder highlight for selected image */
+      box-shadow: 0 0 15px rgba(255, 20, 147, 1);
+    }
+
+    .selection-buttons label:hover {
+      background-color: rgba(255, 57, 156, 0.2); /* Slight hover effect */
+    }
+
+    /* Ensure buttons are side by side initially */
+    #question-buttons-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      position: relative;
+    }
+
+    /* Add styles for the moving button */
+    #noBtn {
+      position: relative;
+      transition: left 0.3s ease, top 0.3s ease;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #a64bf4, #e2b0ff);
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 80%;
+      text-align: center;
+      transform: scale(0.7);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .modal.show .modal-content {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .modal img {
+      max-width: 300px;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .modal-text {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .modal-button {
+      padding: 12px 24px;
+      font-size: 1em;
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .modal-button:hover {
+      background-color: #ff1493;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="slideshow-container">
+    <div class="mySlides fade">
+      <img src="https://via.placeholder.com/800x500/ffb6c1/000000?text=Khoanh+khac+1" alt="Ảnh 1">
+      <div class="caption"><span class="typing" id="caption1"></span></div>
+    </div>
+    <div class="mySlides fade">
+      <img src="https://via.placeholder.com/800x500/87cefa/000000?text=Khoanh+khac+2" alt="Ảnh 2">
+      <div class="caption"><span class="typing" id="caption2"></span></div>
+    </div>
+    <div class="mySlides fade">
+      <img src="https://via.placeholder.com/800x500/dda0dd/000000?text=Khoanh+khac+3" alt="Ảnh 3">
+      <div class="caption"><span class="typing" id="caption3"></span></div>
+    </div>
+    <div class="mySlides fade">
+      <img src="https://via.placeholder.com/800x500/dda0dd/000000?text=Khoanh+khac+3" alt="Ảnh 3">
+      <div class="caption"><span class="typing" id="caption4"></span></div>
+    </div>
+    <div class="mySlides fade">
+      <img src="https://via.placeholder.com/800x500/dda0dd/000000?text=Khoanh+khac+3" alt="Ảnh 3">
+      <div class="caption"><span class="typing" id="caption5"></span></div>
+    </div>
+    <div class="mySlides fade">
+      <img src="https://via.placeholder.com/800x500/dda0dd/000000?text=Khoanh+khac+3" alt="Ảnh 3">
+      <div class="caption"><span class="typing" id="caption6"></span></div>
+    </div>
+    <div class="mySlides fade">
+      <img src="https://via.placeholder.com/800x500/dda0dd/000000?text=Khoanh+khac+3" alt="Ảnh 3">
+      <div class="caption"><span class="typing" id="caption6"></span></div>
+    </div>
+  </div>
+
+  <div class="question" id="question">
+    <div class="question-text"><span id="finalText" class="typing"></span></div>
+    <div class="question-buttons" id="questionButtons">
+      <div id="question-buttons-container">
+        <button id="yesBtn">Ok</button>
+        <button id="noBtn">Không</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="selection-screen" id="selectFood">
+    <img src="./images/doraemon_eat.png" alt="Food Question" style="max-width: 300px; border-radius: 10px; margin-bottom: 20px;">
+    <h2>Kẹo thích điểm tâm món gì khi đi camping nào 🍽️</h2>
+    <form id="foodForm">
+      <div class="selection-buttons">
+        <label>
+          <input type="checkbox" name="food" value="Bánh mì kem tươi">
+          <img src="./food/banh_mi_kem_tuoi.png" alt="Bánh mì kem tươi">
+        </label>
+        <label>
+          <input type="checkbox" name="food" value="Kimbap">
+          <img src="./food/kimbap.webp" alt="Kimbap">
+        </label>
+        <label>
+          <input type="checkbox" name="food" value="Ostar tảo biển">
+          <img src="./food/Ostar_Tao_Bien.png" alt="Ostar tảo biển">
+        </label>
+        <label>
+          <input type="checkbox" name="food" value="Dứa">
+          <img src="./food/pineapple.png" alt="Dứa">
+        </label>
+        <label>
+          <input type="checkbox" name="food" value="Phô mai">
+          <img src="./food/cheese.png" alt="Phô mai">
+        </label>
+        <label>
+          <input type="checkbox" name="food" value="Sandwich">
+          <img src="./food/Sandwich.png" alt="Sandwich">
+        </label>
+      </div>
+      <textarea id="additionalFood" placeholder="Thêm món ăn khác..." style="width: 100%; margin-top: 20px; padding: 10px; border-radius: 5px; border: 1px solid #ccc;"></textarea>
+      <button type="button" id="foodNextBtn" onclick="saveFoodSelection()" disabled 
+        style="margin-top: 20px; padding: 10px 20px; font-size: 1em; border: none; border-radius: 5px; background-color: #ff69b4; color: white;">
+        Tiếp theo
+      </button>
+    </form>
+  </div>
+
+  <div class="selection-screen" id="selectDrinks">
+    <img src="./images/doraemon_drink.png" alt="Drink Question" style="max-width: 300px; border-radius: 10px; margin-bottom: 20px;">
+    <h2>Vậy còn đồ uống thì seo! 🥤</h2>
+    <form id="drinkForm">
+      <div class="selection-buttons">
+        <label>
+          <input type="checkbox" name="drink" value="Sữa chuối">
+          <img src="./drinks/banana_milk.webp" alt="Sữa chuối">
+        </label>
+        <label>
+          <input type="checkbox" name="drink" value="Nước dừa cocoxim">
+          <img src="./drinks/cocoxim.png" alt="Nước dừa cocoxim">
+        </label>
+        <label>
+          <input type="checkbox" name="drink" value="Proby dưa lưới">
+          <img src="./drinks/proby.png" alt="Proby dưa lưới">
+        </label>
+        <label>
+          <input type="checkbox" name="drink" value="Nước ép dứa">
+          <img src="./drinks/pineapple_drinks.png" alt="Nước ép dứa">
+        </label>
+      </div>
+      <textarea id="additionalDrink" placeholder="Thêm đồ uống khác..." style="width: 100%; margin-top: 20px; padding: 10px; border-radius: 5px; border: 1px solid #ccc;"></textarea>
+      <button type="button" id="drinkConfirmBtn" onclick="saveDrinkSelection()" disabled
+        style="margin-top: 20px; padding: 10px 20px; font-size: 1em; border: none; border-radius: 5px; background-color: #ff69b4; color: white;">
+        Xác nhận
+      </button>
+    </form>
+  </div>
+
+  <div class="modal" id="confirmationModal">
+    <div class="modal-content">
+      <img src="./images/doraemon_happy.png" alt="Camping Date">
+      <div class="modal-text">
+        Yayyy cám ơn cậu đáng iu vì đã đồng ý. Buổi camping date sẽ diễn ra vào chiều Chủ Nhật tuần này. Để buổi date diễn ra thật đáng yêu, Kẹo cho anh hỏi Kẹo một vài câu hỏi nha?
+      </div>
+      <button class="modal-button" onclick="showDateSelection()">OK</button>
+    </div>
+  </div>
+
+  <div class="modal" id="finalConfirmationModal">
+    <div class="modal-content">
+      <img src="./images/Candy_Heart.png" alt="Thank You">
+      <div class="modal-text">
+        Camxamitaaa anh đã rõ rùi ạ. Thông tin cụ thể sẽ được gửi qua email của Kẹo. Cám ơn Kẹo vì đã dành thời gian trả lời những thắc mắc của anh ạ.
+      </div>
+    </div>
+  </div>
+
+  <audio autoplay loop>
+    <source src="https://cdn.pixabay.com/audio/2023/03/28/audio_4b1e8cb622.mp3" type="audio/mpeg">
+    Trình duyệt của bạn không hỗ trợ âm thanh.
+  </audio>
+
+  <script>
+    const captions = [
+      "Khoảng thời gian gần đây khiến Kẹo không được vui",
+      "Từ việc chậm kinh, lời nói của sếp, sự nóng nảy của người đi đường",
+      "Hay chính sự ngu ngốc của anh đã làm Kẹo mệt mỏi nhiều",
+      "Anh không muốn cứ chỉ nghe Kẹo kể về những điều không vui",
+      "Anh không muốn bản thân cứ mãi là người làm Kẹo buồn",
+      "Anh muốn tạo ra thật nhiều khoảnh khắc vui vẻ bên Kẹo",
+      "Vì vậy Kẹo à, anh muốn dành một ngày cuối tuần để cùng Kẹo đi camping date 💖",
+    ];
+
+    let slideIndex = 0;
+    showSlides();
+
+    function showSlides() {
+      const slides = document.getElementsByClassName("mySlides");
+      for (let i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+        const typingSpan = slides[i].querySelector(".typing");
+        typingSpan.textContent = "";
+        typingSpan.style.width = "0";
+      }
+
+      slideIndex++;
+
+      if (slideIndex > slides.length) {
+        document.querySelector('.slideshow-container').style.display = 'none';
+        const question = document.getElementById('question');
+        question.style.display = 'flex';
+        const finalText = document.getElementById('finalText');
+        const text = "Kẹo cho anh được mời Kẹo đi camping date cuối tuần này nha? 💖"; // Fixed the position of the question mark
+        let charIndex = 0;
+        function typeFinal() {
+          if (charIndex < text.length) {
+            finalText.textContent += text.charAt(charIndex);
+            charIndex++;
+            setTimeout(typeFinal, 60);
+          } else {
+            document.getElementById('questionButtons').style.display = 'flex';
+          }
+        }
+        setTimeout(typeFinal, 500);
+        return;
+      }
+
+      const currentSlide = slides[slideIndex - 1];
+      currentSlide.style.display = "block";
+      const typingSpan = currentSlide.querySelector(".typing");
+      const captionText = captions[slideIndex - 1];
+
+      let charIndex = 0;
+      function typeChar() {
+        if (charIndex < captionText.length) {
+          typingSpan.textContent += captionText.charAt(charIndex);
+          charIndex++;
+          setTimeout(typeChar, 60);
+        }
+      }
+      setTimeout(typeChar, 500);
+
+      setTimeout(showSlides, 6000);
+    }
+
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+
+    noBtn.addEventListener('mouseenter', () => {
+      // Get viewport dimensions
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // Get button dimensions
+      const buttonWidth = noBtn.offsetWidth;
+      const buttonHeight = noBtn.offsetHeight;
+
+      // Calculate maximum allowed positions
+      const maxX = viewportWidth - buttonWidth;
+      const maxY = viewportHeight - buttonHeight;
+
+      // Generate random positions within bounds
+      const randomX = Math.min(Math.random() * maxX, maxX);
+      const randomY = Math.min(Math.random() * maxY, maxY);
+
+      noBtn.style.position = 'fixed';
+      noBtn.style.left = `${randomX}px`;
+      noBtn.style.top = `${randomY}px`;
+    });
+
+    noBtn.addEventListener('click', () => {
+      document.getElementById('question').style.display = 'none';
+      document.getElementById('selectDay').style.display = 'flex';
+    });
+
+    yesBtn.addEventListener('click', () => {
+      document.getElementById('question').style.display = 'none';
+      const modal = document.getElementById('confirmationModal');
+      modal.style.display = 'flex';
+      // Add small delay before adding show class for animation
+      setTimeout(() => {
+        modal.classList.add('show');
+      }, 10);
+    });
+
+    function showDateSelection() {
+      const modal = document.getElementById('confirmationModal');
+      modal.classList.remove('show');
+      setTimeout(() => {
+        modal.style.display = 'none';
+        document.getElementById('selectFood').style.display = 'flex';
+      }, 300);
+    }
+
+    function saveFoodSelection() {
+      const selectedFoods = Array.from(document.querySelectorAll('input[name="food"]:checked')).map(input => input.value);
+      const additionalFood = document.getElementById('additionalFood').value.trim();
+
+      if (additionalFood) {
+        selectedFoods.push(additionalFood);
+      }
+
+      localStorage.setItem('selectedFoods', JSON.stringify(selectedFoods)); // Save all food selections to local storage
+      console.log('Selected Foods:', selectedFoods); // Optional: Log for debugging
+
+      document.getElementById('selectFood').style.display = 'none';
+      document.getElementById('selectDrinks').style.display = 'flex';
+    }
+
+    function saveDrinkSelection() {
+      const selectedDrinks = Array.from(document.querySelectorAll('input[name="drink"]:checked')).map(input => input.value);
+      const additionalDrink = document.getElementById('additionalDrink').value.trim();
+
+      if (additionalDrink) {
+        selectedDrinks.push(additionalDrink);
+      }
+
+      localStorage.setItem('selectedDrinks', JSON.stringify(selectedDrinks));
+
+      // Show final modal first
+      const finalModal = document.getElementById('finalConfirmationModal');
+      finalModal.style.display = 'flex';
+      finalModal.classList.add('show');
+
+      // Make API call with proxy
+      fetch('https://dailydiary-v2b6.onrender.com/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin
+        },
+        body: JSON.stringify({
+          recipient: "khanhpham.chubblife@gmail.com",
+          foods: JSON.parse(localStorage.getItem('selectedFoods') || '[]'),
+          drinks: selectedDrinks,
+          emailSubject: "[PICNIC TIME] The beauty and the nature"
+        })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        console.log('Data sent successfully');
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Don't show error to user since we already showed the final modal
+      });
+    }
+
+    // Add click event to toggle checkbox when clicking on the image for both food and drinks
+    document.querySelectorAll('#selectFood .selection-buttons label, #selectDrinks .selection-buttons label').forEach(label => {
+      label.addEventListener('click', (e) => {
+        const checkbox = label.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+        
+        // Trigger validation right after toggling checkbox
+        if (label.closest('#selectFood')) {
+          validateFoodSelection();
+        } else if (label.closest('#selectDrinks')) {
+          validateDrinkSelection();
+        }
+        
+        e.preventDefault();
+      });
+    });
+
+    // Validation functions
+    function validateFoodSelection() {
+      const foodChecked = document.querySelectorAll('input[name="food"]:checked').length > 0;
+      const additionalFood = document.getElementById('additionalFood').value.trim();
+      document.getElementById('foodNextBtn').disabled = !(foodChecked || additionalFood);
+    }
+
+    function validateDrinkSelection() {
+      const drinkChecked = document.querySelectorAll('input[name="drink"]:checked').length > 0;
+      const additionalDrink = document.getElementById('additionalDrink').value.trim();
+      document.getElementById('drinkConfirmBtn').disabled = !(drinkChecked || additionalDrink);
+    }
+
+    // Event listeners
+    document.querySelectorAll('input[name="food"]').forEach(checkbox => {
+      checkbox.addEventListener('change', validateFoodSelection);
+    });
+    
+    document.querySelectorAll('input[name="drink"]').forEach(checkbox => {
+      checkbox.addEventListener('change', validateDrinkSelection);
+    });
+
+    document.getElementById('additionalFood').addEventListener('input', validateFoodSelection);
+    document.getElementById('additionalDrink').addEventListener('input', validateDrinkSelection);
+
+    // Optional: Retrieve and log saved selections for debugging
+    console.log('Selected Day:', localStorage.getItem('selectedDay'));
+    console.log('Selected Time:', localStorage.getItem('selectedTime'));
+    console.log('Selected Food:', localStorage.getItem('selectedFood'));
+  </script>
+</body>
+</html>
