@@ -281,36 +281,33 @@
 <body>
   <div class="slideshow-container">
     <div class="mySlides fade">
-      <img src="https://via.placeholder.com/800x500/ffb6c1/000000?text=Khoanh+khac+1" alt="Ảnh 1">
+      <img src="./images/Doraemon-Hi.png" alt="Ảnh 1" style="max-width: 300px; border-radius: 10px; margin-bottom: 80px;">
       <div class="caption"><span class="typing" id="caption1"></span></div>
     </div>
     <div class="mySlides fade">
-      <img src="https://via.placeholder.com/800x500/87cefa/000000?text=Khoanh+khac+2" alt="Ảnh 2">
+      <img src="./images/doraemon-wonder.jpg" alt="Ảnh 2" style="max-width: 300px; border-radius: 10px; margin-bottom: 80px;">
       <div class="caption"><span class="typing" id="caption2"></span></div>
     </div>
     <div class="mySlides fade">
-      <img src="https://via.placeholder.com/800x500/dda0dd/000000?text=Khoanh+khac+3" alt="Ảnh 3">
+      <img src="./images/doraemon-missing.webp" alt="Ảnh 3" style="max-width: 300px; border-radius: 10px; margin-bottom: 80px;">
       <div class="caption"><span class="typing" id="caption3"></span></div>
     </div>
     <div class="mySlides fade">
-      <img src="https://via.placeholder.com/800x500/dda0dd/000000?text=Khoanh+khac+3" alt="Ảnh 3">
+      <img src="./images/doraemon-picnic.jpg" alt="Ảnh 4" style="max-width: 300px; border-radius: 10px; margin-bottom: 80px;">
       <div class="caption"><span class="typing" id="caption4"></span></div>
     </div>
     <div class="mySlides fade">
-      <img src="https://via.placeholder.com/800x500/dda0dd/000000?text=Khoanh+khac+3" alt="Ảnh 3">
+      <img src="./images/doraemon-hug.jpg" alt="Ảnh 5" style="max-width: 300px; border-radius: 10px; margin-bottom: 80px;">
       <div class="caption"><span class="typing" id="caption5"></span></div>
     </div>
     <div class="mySlides fade">
-      <img src="https://via.placeholder.com/800x500/dda0dd/000000?text=Khoanh+khac+3" alt="Ảnh 3">
-      <div class="caption"><span class="typing" id="caption6"></span></div>
-    </div>
-    <div class="mySlides fade">
-      <img src="https://via.placeholder.com/800x500/dda0dd/000000?text=Khoanh+khac+3" alt="Ảnh 3">
+      <img src="./images/doraemon-happy.jpg" alt="Ảnh 6" style="max-width: 300px; border-radius: 10px; margin-bottom: 80px;">
       <div class="caption"><span class="typing" id="caption6"></span></div>
     </div>
   </div>
 
   <div class="question" id="question">
+    <img src="./images/doraemon-invite.jpeg" alt="Ảnh 6" style="max-width: 300px; border-radius: 10px;">
     <div class="question-text"><span id="finalText" class="typing"></span></div>
     <div class="question-buttons" id="questionButtons">
       <div id="question-buttons-container">
@@ -414,13 +411,12 @@
 
   <script>
     const captions = [
-      "Khoảng thời gian gần đây khiến Kẹo không được vui",
-      "Từ việc chậm kinh, lời nói của sếp, sự nóng nảy của người đi đường",
-      "Hay chính sự ngu ngốc của anh đã làm Kẹo mệt mỏi nhiều",
-      "Anh không muốn cứ chỉ nghe Kẹo kể về những điều không vui",
-      "Anh không muốn bản thân cứ mãi là người làm Kẹo buồn",
-      "Anh muốn tạo ra thật nhiều khoảnh khắc vui vẻ bên Kẹo",
-      "Vì vậy Kẹo à, anh muốn dành một ngày cuối tuần để cùng Kẹo đi camping date 💖",
+      "Chào bủi tối Kẹo đáng iu 💖",
+      "Ngày hum nay Kẹo có mệt nhiều hong?",
+      "Kẹo à anh nhớ Kẹo đáng iu nhiều lắm 💖",
+      "Anh đã luôn muốn được một lần đi picnic cùng Kẹo 💖",
+      "Nhân dịp này anh muốn được tổ chức một buổi picnic date với Kẹo",
+      "Anh sẽ cố gắng để Kẹo có một ngày cuối tuần thật dễ chịu"
     ];
 
     let slideIndex = 0;
@@ -442,7 +438,7 @@
         const question = document.getElementById('question');
         question.style.display = 'flex';
         const finalText = document.getElementById('finalText');
-        const text = "Kẹo cho anh được mời Kẹo đi camping date cuối tuần này nha? 💖"; // Fixed the position of the question mark
+        const text = "Kẹo cho anh được mời Kẹo đi picnic date cuối tuần này nha? 💖"; // Fixed the position of the question mark
         let charIndex = 0;
         function typeFinal() {
           if (charIndex < text.length) {
